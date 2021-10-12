@@ -14,17 +14,17 @@ app.get('/users', async (req, res) => {
   res.json(usersList);
 });
 
+app.post('/createUser', async (req, res) => {
+  await users.create({...req.body,
+    login: 'test_login',
+    password: 'test_password',
+    isDeleted: false,
+  });
+  res.json('Success');
+});
+
 db.sequelize.sync().then(() => {
   app.listen(3001, () => {
     console.log('Server initialization success');
-
-    users.create({
-      name: 'test_name',
-      surname: 'test_surname',
-      dateOfBirth: '1999-01-01',
-      login: 'test_login',
-      password: 'test_password',
-      isDeleted: false,
-    });
   });
 });
