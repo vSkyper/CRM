@@ -10,16 +10,24 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/users', async (req, res) => {
-  const usersList = await users.findAll();
+  const usersList = await users.findAll({
+    where: {
+      isDeleted: false,
+    },
+  });
   res.json(usersList);
 });
 
 app.post('/createUser', async (req, res) => {
-  await users.create({...req.body,
-    login: 'test_login',
-    password: 'test_password',
+  await users.create({
+    ...req.body,
     isDeleted: false,
   });
+  res.json('Success');
+});
+
+app.delete('/deleteUser', async (req, res) => {
+  await users.update({ isDeleted: true }, { where: { id: req.body.id } });
   res.json('Success');
 });
 

@@ -15,86 +15,138 @@ import {
   Button,
 } from '@mui/material';
 
+const getUsers = (setUsers) => {
+  axios
+    .get('http://localhost:3001/users')
+    .then((res) => {
+      setUsers(res.data);
+    })
+    .catch((error) => console.log(error));
+};
+
 const App = () => {
   const [users, setUsers] = useState([]);
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
-  const [birthdate, setBirthdate] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/users')
-      .then((res) => {
-        setUsers(res.data);
-      })
-      .catch((error) => console.log(error));
+    getUsers(setUsers);
   }, []);
 
   const submitForm = () => {
-    const data = { name: name, surname: surname, dateOfBirth: birthdate };
+    const data = { name, surname, dateOfBirth, login, password };
 
-    axios.post('http://localhost:3001/createUser', data).then(() => {
-      setName('');
-      setSurname('');
-      setBirthdate('');
-      axios
-        .get('http://localhost:3001/users')
-        .then((res) => {
-          setUsers(res.data);
-          console.log(res.data);
-        })
-        .catch((error) => console.log(error));
-    });
+    axios
+      .post('http://localhost:3001/createUser', data)
+      .then(() => {
+        setName('');
+        setSurname('');
+        setDateOfBirth('');
+        setLogin('');
+        setPassword('');
+        getUsers(setUsers);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const deleteUser = (id) => {
+    axios
+      .delete('http://localhost:3001/deleteUser', { data: { id } })
+      .then(() => {
+        getUsers(setUsers);
+      })
+      .catch((error) => console.log(error));
   };
 
   return (
     <Container maxWidth='lg'>
       <CssBaseline />
-      <Grid container spacing={5} sx={{ mt: 4 }}>
-        <Grid item xs={4}>
+      <Grid
+        container
+        justifyContent='flex-start'
+        alignItems='center'
+        spacing={3}
+        sx={{ mt: 4 }}
+      >
+        <Grid item xs={3}>
           <TextField
             label='Name'
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <TextField
             label='Surname'
             value={surname}
             onChange={(e) => setSurname(e.target.value)}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={6}>
           <TextField
             label='Birthdate'
-            value={birthdate}
+            value={dateOfBirth}
             type='date'
             InputLabelProps={{ shrink: true }}
-            onChange={(e) => setBirthdate(e.target.value)}
+            onChange={(e) => setDateOfBirth(e.target.value)}
           />
         </Grid>
+        <Grid item xs={3}>
+          <TextField
+            label='Login'
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <TextField
+            label='Password'
+            value={password}
+            type='password'
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button variant='contained' onClick={submitForm}>
+            Submit
+          </Button>
+        </Grid>
       </Grid>
-      <Button variant='contained' sx={{ mt: 2 }} onClick={submitForm}>
-        Submit
-      </Button>
       <TableContainer component={Paper} sx={{ mt: 4 }}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
+              <TableCell>Login</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Surname</TableCell>
               <TableCell>Birthdate</TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.id}</TableCell>
+                <TableCell>{user.login}</TableCell>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.surname}</TableCell>
                 <TableCell>{user.dateOfBirth}</TableCell>
+                <TableCell>
+                  <Button variant='outlined'>Edit</Button>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant='outlined'
+                    onClick={() => deleteUser(user.id)}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
