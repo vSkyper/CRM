@@ -3,6 +3,8 @@ const app = express();
 
 const cors = require('cors');
 
+const bcrypt = require('bcrypt');
+
 const db = require('./models');
 const { users } = require('./models');
 
@@ -19,11 +21,18 @@ app.get('/users', async (req, res) => {
 });
 
 app.post('/createUser', async (req, res) => {
-  await users.create({
-    ...req.body,
-    isDeleted: false,
+  bcrypt.hash(req.body.password, 10, async (err, hash) => {
+    if (err) {
+      res.json(err);
+    } else {
+      await users.create({
+        ...req.body,
+        password: hash,
+        isDeleted: false,
+      });
+      res.json('Success');
+    }
   });
-  res.json('Success');
 });
 
 app.delete('/deleteUser', async (req, res) => {
