@@ -73,13 +73,13 @@ const Main = () => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Login</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Surname</TableCell>
-            <TableCell>Birthdate</TableCell>
-            <TableCell></TableCell>
-            <TableCell></TableCell>
+            <TableCell sx={{width: 50}}>ID</TableCell>
+            <TableCell sx={{width: 300}}>Login</TableCell>
+            <TableCell sx={{width: 300}}>Name</TableCell>
+            <TableCell sx={{width: 300}}>Surname</TableCell>
+            <TableCell sx={{width: 300}}>Birthdate</TableCell>
+            <TableCell sx={{width: 100}}></TableCell>
+            <TableCell sx={{width: 100}}></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -93,6 +93,7 @@ const Main = () => {
                       label='Login'
                       value={editLogin}
                       onChange={(e) => setEditLogin(e.target.value)}
+                      sx={{ width: 180 }}
                     />
                   </TableCell>
                   <TableCell>
@@ -100,6 +101,7 @@ const Main = () => {
                       label='Name'
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
+                      sx={{ width: 180 }}
                     />
                   </TableCell>
                   <TableCell>
@@ -107,15 +109,17 @@ const Main = () => {
                       label='Surname'
                       value={editSurname}
                       onChange={(e) => setEditSurname(e.target.value)}
+                      sx={{ width: 180 }}
                     />
                   </TableCell>
                   <TableCell>
                     <TextField
-                      label='dateOfBirth'
+                      label='Birthdate'
                       value={editDateOfBirth}
                       type='date'
                       InputLabelProps={{ shrink: true }}
                       onChange={(e) => setEditDateOfBirth(e.target.value)}
+                      sx={{ width: 165 }}
                     />
                   </TableCell>
                   <TableCell>
