@@ -28,7 +28,7 @@ const Register = () => {
       container
       alignItems='center'
       justifyContent='center'
-      style={{ minHeight: '100vh' }}
+      style={{ minHeight: '80vh' }}
     >
       <Paper sx={{ p: 5 }}>
         <Grid container direction='column' alignItems='center' spacing={4}>

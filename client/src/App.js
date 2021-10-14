@@ -1,5 +1,6 @@
-import { Container, CssBaseline, Button } from '@mui/material';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { Container, CssBaseline } from '@mui/material';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Navbar from './components/Navbar';
 import Main from './components/Main';
 import Register from './components/Register';
 
@@ -8,9 +9,7 @@ const App = () => {
     <Container maxWidth='lg'>
       <CssBaseline />
       <Router basename={process.env.PUBLIC_URL}>
-        <Button variant='contained' component={Link} to='/register'>
-          Register
-        </Button>
+        <Navbar />
         <Switch>
           <Route exact path='/'>
             <Main />

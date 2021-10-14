@@ -8,6 +8,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  TextField,
   Button,
 } from '@mui/material';
 
@@ -23,9 +24,40 @@ const getUsers = (setUsers) => {
 const Main = () => {
   const [users, setUsers] = useState([]);
 
+  const [editID, setEditID] = useState(null);
+  const [editLogin, setEditLogin] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editSurname, setEditSurname] = useState('');
+  const [editDateOfBirth, setEditDateOfBirth] = useState('');
+
   useEffect(() => {
     getUsers(setUsers);
   }, []);
+
+  const setEdit = (user) => {
+    setEditID(user.id);
+    setEditLogin(user.login);
+    setEditName(user.name);
+    setEditSurname(user.surname);
+    setEditDateOfBirth(user.dateOfBirth);
+  };
+
+  const submitEdit = () => {
+    const data = {
+      id: editID,
+      name: editName,
+      surname: editSurname,
+      dateOfBirth: editDateOfBirth,
+      login: editLogin,
+    };
+    axios
+      .put('http://localhost:3001/editUser', data)
+      .then(() => {
+        getUsers(setUsers);
+        setEditID(null);
+      })
+      .catch((error) => console.log(error));
+  };
 
   const deleteUser = (id) => {
     axios
@@ -37,7 +69,7 @@ const Main = () => {
   };
 
   return (
-    <TableContainer component={Paper} sx={{ mt: 4 }}>
+    <TableContainer component={Paper} sx={{ my: 4 }}>
       <Table>
         <TableHead>
           <TableRow>
@@ -53,16 +85,69 @@ const Main = () => {
         <TableBody>
           {users.map((user) => (
             <TableRow key={user.id}>
-              <TableCell>{user.id}</TableCell>
-              <TableCell>{user.login}</TableCell>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.surname}</TableCell>
-              <TableCell>{user.dateOfBirth}</TableCell>
+              {editID === user.id ? (
+                <>
+                  <TableCell>{user.id}</TableCell>
+                  <TableCell>
+                    <TextField
+                      label='Login'
+                      value={editLogin}
+                      onChange={(e) => setEditLogin(e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      label='Name'
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      label='Surname'
+                      value={editSurname}
+                      onChange={(e) => setEditSurname(e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      label='dateOfBirth'
+                      value={editDateOfBirth}
+                      type='date'
+                      InputLabelProps={{ shrink: true }}
+                      onChange={(e) => setEditDateOfBirth(e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant='outlined'
+                      color='success'
+                      onClick={submitEdit}
+                    >
+                      Save
+                    </Button>
+                  </TableCell>
+                </>
+              ) : (
+                <>
+                  <TableCell>{user.id}</TableCell>
+                  <TableCell>{user.login}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.surname}</TableCell>
+                  <TableCell>{user.dateOfBirth}</TableCell>
+                  <TableCell>
+                    <Button variant='outlined' onClick={() => setEdit(user)}>
+                      Edit
+                    </Button>
+                  </TableCell>
+                </>
+              )}
               <TableCell>
-                <Button variant='outlined'>Edit</Button>
-              </TableCell>
-              <TableCell>
-                <Button variant='outlined' onClick={() => deleteUser(user.id)}>
+                <Button
+                  variant='outlined'
+                  color='error'
+                  onClick={() => deleteUser(user.id)}
+                >
                   Delete
                 </Button>
               </TableCell>

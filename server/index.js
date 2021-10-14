@@ -1,10 +1,7 @@
 const express = require('express');
 const app = express();
-
 const cors = require('cors');
-
 const bcrypt = require('bcrypt');
-
 const db = require('./models');
 const { users } = require('./models');
 
@@ -13,6 +10,7 @@ app.use(express.json());
 
 app.get('/users', async (req, res) => {
   const usersList = await users.findAll({
+    attributes: ['id', 'name', 'surname', 'dateOfBirth', 'login'],
     where: {
       isDeleted: false,
     },
@@ -33,6 +31,18 @@ app.post('/createUser', async (req, res) => {
       res.json('Success');
     }
   });
+});
+
+app.put('/editUser', async (req, res) => {
+  const name = req.body.name;
+  const surname = req.body.surname;
+  const dateOfBirth = req.body.dateOfBirth;
+  const login = req.body.login;
+  await users.update(
+    { name, surname, dateOfBirth, login },
+    { where: { id: req.body.id } }
+  );
+  res.json('Success');
 });
 
 app.delete('/deleteUser', async (req, res) => {
