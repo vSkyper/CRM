@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "nodemon index.js"
   },
   "author": "",
@@ -15,7 +15,12 @@
     "express": "^4.17.1",
     "mysql2": "^2.3.0",
     "nodemon": "^2.0.13",
-    "sequelize": "^6.7.0",
+    "sequelize": "^6.7.0"
+  },
+  "devDependencies": {
+    "axios": "^0.23.0",
+    "faker": "^5.5.3",
+    "jest": "^27.2.5",
     "sequelize-cli": "^6.2.0"
   }
 }
