@@ -8,6 +8,8 @@ const { users } = require('./models');
 app.use(cors());
 app.use(express.json());
 
+const { UniqueConstraintError, DatabaseError } = require('sequelize');
+
 app.get('/users/:page', async (req, res) => {
   const limit = 10;
   const offset = req.params.page * limit;
@@ -31,6 +33,17 @@ app.get('/users/:page', async (req, res) => {
 });
 
 app.post('/createUser', async (req, res) => {
+  if (
+    !req.body.name ||
+    !req.body.surname ||
+    !req.body.dateOfBirth ||
+    !req.body.login ||
+    !req.body.password
+  ) {
+    res.json({ error: 'Fill in all fields.' });
+    return;
+  }
+
   bcrypt.hash(req.body.password, 10, async (err, hash) => {
     if (err) {
       res.json(err);
@@ -44,7 +57,13 @@ app.post('/createUser', async (req, res) => {
         res.json('Success');
       } catch (error) {
         console.log(error);
-        res.json('Failure');
+        if (error instanceof UniqueConstraintError) {
+          res.json({ error: 'This username is unavailable.' });
+        } else if (error instanceof DatabaseError) {
+          res.json({ error: 'Check all fields.' });
+        } else {
+          res.json({ error: 'Unknown error.' });
+        }
       }
     }
   });

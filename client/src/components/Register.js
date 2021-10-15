@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { TextField, Grid, Paper, Button } from '@mui/material';
+import { TextField, Grid, Paper, Button, Alert } from '@mui/material';
 import { useHistory } from 'react-router-dom';
 
 const Register = () => {
@@ -10,6 +10,8 @@ const Register = () => {
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [password, setPassword] = useState('');
 
+  const [error, setError] = useState(null);
+
   const history = useHistory();
 
   const submitForm = () => {
@@ -17,8 +19,12 @@ const Register = () => {
 
     axios
       .post('http://localhost:3001/createUser', data)
-      .then(() => {
-        history.push('/');
+      .then((res) => {
+        if (res.data.error) {
+          setError(res.data.error);
+        } else {
+          history.push('/');
+        }
       })
       .catch((error) => console.log(error));
   };
@@ -75,6 +81,11 @@ const Register = () => {
               sx={{ width: 300 }}
             />
           </Grid>
+          {error && (
+            <Grid item>
+              <Alert severity='error'>{error}</Alert>
+            </Grid>
+          )}
           <Grid item>
             <Button variant='contained' onClick={submitForm}>
               Create account
