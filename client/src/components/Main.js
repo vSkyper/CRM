@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
   Table,
@@ -11,17 +11,9 @@ import {
   TextField,
   Button,
   Grid,
+  Snackbar,
+  Alert,
 } from '@mui/material';
-
-const getUsers = (setUsers, page, setTotalPages) => {
-  axios
-    .get(`http://localhost:3001/users/${page}`)
-    .then((res) => {
-      setUsers(res.data.rows);
-      setTotalPages(res.data.totalPages);
-    })
-    .catch((error) => console.log(error));
-};
 
 const Main = () => {
   const [users, setUsers] = useState([]);
@@ -34,9 +26,25 @@ const Main = () => {
   const [editSurname, setEditSurname] = useState('');
   const [editDateOfBirth, setEditDateOfBirth] = useState('');
 
-  useEffect(() => {
-    getUsers(setUsers, page, setTotalPages);
+  const [error, setError] = useState(null);
+
+  const getUsers = useCallback(() => {
+    axios
+      .get(`http://localhost:3001/users/${page}`)
+      .then((res) => {
+        if (res.data.rows.length === 0 && page !== 0) {
+          setPage(page - 1);
+        } else {
+          setUsers(res.data.rows);
+          setTotalPages(res.data.totalPages);
+        }
+      })
+      .catch((error) => console.log(error));
   }, [page]);
+
+  useEffect(() => {
+    getUsers();
+  }, [page, getUsers]);
 
   const setEdit = (user) => {
     setEditID(user.id);
@@ -57,9 +65,14 @@ const Main = () => {
 
     axios
       .put('http://localhost:3001/editUser', data)
-      .then(() => {
-        getUsers(setUsers, page, setTotalPages);
-        setEditID(null);
+      .then((res) => {
+        if (res.data.error) {
+          setError(res.data.error);
+        } else {
+          getUsers();
+          setEditID(null);
+          setError(null);
+        }
       })
       .catch((error) => console.log(error));
   };
@@ -68,13 +81,16 @@ const Main = () => {
     axios
       .delete('http://localhost:3001/deleteUser', { data: { id } })
       .then(() => {
-        getUsers(setUsers, page, setTotalPages);
+        getUsers();
       })
       .catch((error) => console.log(error));
   };
 
   return (
     <>
+      <Snackbar open={error} autoHideDuration={6000}>
+        <Alert severity='error'>{error}</Alert>
+      </Snackbar>
       <TableContainer component={Paper} sx={{ mt: 4 }}>
         <Table>
           <TableHead>
@@ -125,7 +141,7 @@ const Main = () => {
                         type='date'
                         InputLabelProps={{ shrink: true }}
                         onChange={(e) => setEditDateOfBirth(e.target.value)}
-                        sx={{ width: 165 }}
+                        sx={{ width: 180 }}
                       />
                     </TableCell>
                     <TableCell>
