@@ -1,5 +1,10 @@
 import { Container, CssBaseline } from '@mui/material';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Main from './components/Main';
 import Register from './components/Register';
@@ -12,6 +17,9 @@ const App = () => {
         <Navbar />
         <Switch>
           <Route exact path='/'>
+            <Redirect to='/page/1' />
+          </Route>
+          <Route exact path='/page/:page'>
             <Main />
           </Route>
           <Route exact path='/register'>

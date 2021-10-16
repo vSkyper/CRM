@@ -14,10 +14,10 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
+import { useHistory, useParams } from 'react-router-dom';
 
 const Main = () => {
   const [users, setUsers] = useState([]);
-  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
   const [editID, setEditID] = useState(null);
@@ -28,6 +28,9 @@ const Main = () => {
 
   const [error, setError] = useState(null);
 
+  const history = useHistory();
+  const { page } = useParams();
+
   const getUsers = useCallback(() => {
     axios
       .get(`http://localhost:3001/users/${page}`)
@@ -35,8 +38,8 @@ const Main = () => {
         if (res.data.error) {
           console.log(res.data.error);
         } else {
-          if (res.data.rows.length === 0 && page !== 0) {
-            setPage(page - 1);
+          if (res.data.rows.length === 0 && page > 1) {
+            history.push(`/page/${page - 1}`);
           } else {
             setUsers(res.data.rows);
             setTotalPages(res.data.totalPages);
@@ -44,7 +47,7 @@ const Main = () => {
         }
       })
       .catch((error) => console.log(error));
-  }, [page]);
+  }, [page, history]);
 
   useEffect(() => {
     getUsers();
@@ -84,7 +87,7 @@ const Main = () => {
   const deleteUser = (id) => {
     axios
       .delete('http://localhost:3001/deleteUser', { data: { id } })
-      .then(() => {
+      .then((res) => {
         if (res.data.error) {
           console.log(res.data.error);
         } else {
@@ -195,10 +198,7 @@ const Main = () => {
           <Grid item key={pageID}>
             <Button
               variant='contained'
-              onClick={() => {
-                setPage(pageID);
-                window.scrollTo(0, 0);
-              }}
+              onClick={() => history.push(`/page/${pageID + 1}`)}
             >
               {pageID + 1}
             </Button>

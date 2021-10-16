@@ -11,13 +11,13 @@ app.use(express.json());
 const { UniqueConstraintError, DatabaseError } = require('sequelize');
 
 app.get('/users/:page', async (req, res) => {
-  if (!req.params.page || isNaN(req.params.page) || req.params.page < 0) {
+  if (!req.params.page || isNaN(req.params.page) || req.params.page < 1) {
     res.json({ error: 'Inavlid page number.' });
     return;
   }
 
   const limit = 10;
-  const offset = req.params.page * limit;
+  const offset = (req.params.page - 1) * limit;
 
   try {
     let usersList = await users.findAndCountAll({
@@ -112,7 +112,7 @@ app.put('/editUser', async (req, res) => {
 });
 
 app.delete('/deleteUser', async (req, res) => {
-  if (!req.body.id || isNaN(req.body.id) || req.body.id < 0) {
+  if (!req.body.id || isNaN(req.body.id) || req.body.id < 1) {
     res.json({ error: 'Inavlid ID.' });
     return;
   }

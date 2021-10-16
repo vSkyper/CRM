@@ -23,7 +23,7 @@ const Register = () => {
         if (res.data.error) {
           setError(res.data.error);
         } else {
-          history.push('/');
+          history.push('/page/1');
         }
       })
       .catch((error) => console.log(error));
