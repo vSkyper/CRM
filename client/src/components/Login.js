@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import axios from 'axios';
 import { TextField, Grid, Paper, Button, Alert } from '@mui/material';
 import { useHistory } from 'react-router-dom';
+import { Context } from '../Context';
 
 const Login = () => {
   const [login, setLogin] = useState('');
@@ -10,6 +11,8 @@ const Login = () => {
   const [error, setError] = useState(null);
 
   const history = useHistory();
+
+  const { setAuth } = useContext(Context);
 
   const submitForm = () => {
     const data = { login, password };
@@ -20,7 +23,9 @@ const Login = () => {
         if (res.data.error) {
           setError(res.data.error);
         } else {
-          setError(res.data.success)
+          localStorage.setItem('Authorization', res.data.token);
+          setAuth(true);
+          history.push('/page/1');
         }
       })
       .catch((error) => console.log(error));

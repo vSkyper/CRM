@@ -38,16 +38,12 @@ const Main = () => {
         if (res.data.error) {
           console.log(res.data.error);
         } else {
-          if (res.data.rows.length === 0 && page > 1) {
-            history.push(`/page/${page - 1}`);
-          } else {
-            setUsers(res.data.rows);
-            setTotalPages(res.data.totalPages);
-          }
+          setUsers(res.data.rows);
+          setTotalPages(res.data.totalPages);
         }
       })
       .catch((error) => console.log(error));
-  }, [page, history]);
+  }, [page]);
 
   useEffect(() => {
     getUsers();
@@ -71,7 +67,11 @@ const Main = () => {
     };
 
     axios
-      .put('http://localhost:3001/editUser', data)
+      .put('http://localhost:3001/editUser', data, {
+        headers: {
+          Authorization: localStorage.getItem('Authorization'),
+        },
+      })
       .then((res) => {
         if (res.data.error) {
           setError(res.data.error);
@@ -86,7 +86,12 @@ const Main = () => {
 
   const deleteUser = (id) => {
     axios
-      .delete('http://localhost:3001/deleteUser', { data: { id } })
+      .delete('http://localhost:3001/deleteUser', {
+        data: { id },
+        headers: {
+          Authorization: localStorage.getItem('Authorization'),
+        },
+      })
       .then((res) => {
         if (res.data.error) {
           console.log(res.data.error);
@@ -99,7 +104,7 @@ const Main = () => {
 
   return (
     <>
-      <Snackbar open={error} autoHideDuration={6000}>
+      <Snackbar open={error !== null}>
         <Alert severity='error'>{error}</Alert>
       </Snackbar>
       <TableContainer component={Paper} sx={{ mt: 4 }}>

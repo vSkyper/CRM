@@ -2,8 +2,10 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const { sign } = require('jsonwebtoken');
 const db = require('./models');
 const { users } = require('./models');
+const { authenticateToken } = require('./authenticateToken');
 
 app.use(cors());
 app.use(express.json());
@@ -12,8 +14,7 @@ const { UniqueConstraintError, DatabaseError } = require('sequelize');
 
 app.get('/users/:page', async (req, res) => {
   if (!req.params.page || isNaN(req.params.page) || req.params.page < 1) {
-    res.json({ error: 'Inavlid page number.' });
-    return;
+    return res.json({ error: 'Inavlid page number.' });
   }
 
   const limit = 10;
@@ -35,33 +36,32 @@ app.get('/users/:page', async (req, res) => {
       totalPages,
     };
 
-    res.json(usersList);
+    return res.json(usersList);
   } catch (error) {
-    res.json({ error: 'Unknown error.' });
+    return res.json({ error: 'Unknown error.' });
   }
 });
 
 app.post('/loginUser', async (req, res) => {
   if (!req.body.login || !req.body.password) {
-    res.json({ error: 'Fill in all fields.' });
-    return;
+    return res.json({ error: 'Fill in all fields.' });
   }
 
   const user = await users.findOne({
-    attributes: ['password'],
-    where: { login: req.body.login },
+    attributes: ['id', 'password'],
+    where: { login: req.body.login, isDeleted: false },
   });
 
   if (!user) {
-    res.json({ error: "Incorrect username or password." });
-    return;
+    return res.json({ error: 'Incorrect username or password.' });
   }
 
   bcrypt.compare(req.body.password, user.password, (err, result) => {
-    if (result){
-      res.json({success: 'Hurra!'})
+    if (result) {
+      const jwtToken = sign({ id: user.id }, 'SuperSecretKey');
+      return res.json({ token: jwtToken });
     } else {
-      res.json({error: 'Incorrect username or password.'})
+      return res.json({ error: 'Incorrect username or password.' });
     }
   });
 });
@@ -74,13 +74,12 @@ app.post('/signupUser', async (req, res) => {
     !req.body.login ||
     !req.body.password
   ) {
-    res.json({ error: 'Fill in all fields.' });
-    return;
+    return res.json({ error: 'Fill in all fields.' });
   }
 
   bcrypt.hash(req.body.password, 10, async (err, hash) => {
     if (err) {
-      res.json(err);
+      return res.json(err);
     } else {
       try {
         await users.create({
@@ -88,21 +87,21 @@ app.post('/signupUser', async (req, res) => {
           password: hash,
           isDeleted: false,
         });
-        res.json('Success');
+        return res.json('Success');
       } catch (error) {
         if (error instanceof UniqueConstraintError) {
-          res.json({ error: 'This username is unavailable.' });
+          return res.json({ error: 'This username is unavailable.' });
         } else if (error instanceof DatabaseError) {
-          res.json({ error: 'Check all fields.' });
+          return res.json({ error: 'Check all fields.' });
         } else {
-          res.json({ error: 'Unknown error.' });
+          return res.json({ error: 'Unknown error.' });
         }
       }
     }
   });
 });
 
-app.put('/editUser', async (req, res) => {
+app.put('/editUser', authenticateToken, async (req, res) => {
   if (
     !req.body.name ||
     !req.body.surname ||
@@ -110,8 +109,7 @@ app.put('/editUser', async (req, res) => {
     !req.body.login ||
     !req.body.id
   ) {
-    res.json({ error: 'Fill in all fields.' });
-    return;
+    return res.json({ error: 'Fill in all fields.' });
   }
 
   try {
@@ -124,30 +122,33 @@ app.put('/editUser', async (req, res) => {
       },
       { where: { id: req.body.id } }
     );
-    res.json('Success');
+    return res.json('Success');
   } catch (error) {
     if (error instanceof UniqueConstraintError) {
-      res.json({ error: 'This username is unavailable.' });
+      return res.json({ error: 'This username is unavailable.' });
     } else if (error instanceof DatabaseError) {
-      res.json({ error: 'Check all fields.' });
+      return res.json({ error: 'Check all fields.' });
     } else {
-      res.json({ error: 'Unknown error.' });
+      return res.json({ error: 'Unknown error.' });
     }
   }
 });
 
-app.delete('/deleteUser', async (req, res) => {
+app.delete('/deleteUser', authenticateToken, async (req, res) => {
   if (!req.body.id || isNaN(req.body.id) || req.body.id < 1) {
-    res.json({ error: 'Inavlid ID.' });
-    return;
+    return res.json({ error: 'Inavlid ID.' });
   }
 
   try {
     await users.update({ isDeleted: true }, { where: { id: req.body.id } });
-    res.json('Success');
+    return res.json('Success');
   } catch (error) {
-    res.json({ error: 'Unknown error.' });
+    return res.json({ error: 'Unknown error.' });
   }
+});
+
+app.get('/auth', authenticateToken, async (req, res) => {
+  return res.json('Success');
 });
 
 db.sequelize.sync().then(() => {
