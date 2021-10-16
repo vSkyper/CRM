@@ -13,8 +13,13 @@ const Navbar = () => {
               </Button>
             </Grid>
             <Grid item>
+              <Button variant='contained' component={Link} to='/login'>
+                Log in
+              </Button>
+            </Grid>
+            <Grid item>
               <Button variant='contained' component={Link} to='/register'>
-                Register
+                Sign up
               </Button>
             </Grid>
           </Grid>

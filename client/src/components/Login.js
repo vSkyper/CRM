@@ -3,11 +3,8 @@ import axios from 'axios';
 import { TextField, Grid, Paper, Button, Alert } from '@mui/material';
 import { useHistory } from 'react-router-dom';
 
-const Register = () => {
+const Login = () => {
   const [login, setLogin] = useState('');
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
   const [password, setPassword] = useState('');
 
   const [error, setError] = useState(null);
@@ -15,15 +12,15 @@ const Register = () => {
   const history = useHistory();
 
   const submitForm = () => {
-    const data = { name, surname, dateOfBirth, login, password };
+    const data = { login, password };
 
     axios
-      .post('http://localhost:3001/createUser', data)
+      .post('http://localhost:3001/loginUser', data)
       .then((res) => {
         if (res.data.error) {
           setError(res.data.error);
         } else {
-          history.push('/page/1');
+          setError(res.data.success)
         }
       })
       .catch((error) => console.log(error));
@@ -48,32 +45,6 @@ const Register = () => {
           </Grid>
           <Grid item>
             <TextField
-              label='Name'
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              sx={{ width: 300 }}
-            />
-          </Grid>
-          <Grid item>
-            <TextField
-              label='Surname'
-              value={surname}
-              onChange={(e) => setSurname(e.target.value)}
-              sx={{ width: 300 }}
-            />
-          </Grid>
-          <Grid item>
-            <TextField
-              label='Birthdate'
-              value={dateOfBirth}
-              type='date'
-              InputLabelProps={{ shrink: true }}
-              onChange={(e) => setDateOfBirth(e.target.value)}
-              sx={{ width: 300 }}
-            />
-          </Grid>
-          <Grid item>
-            <TextField
               label='Password'
               value={password}
               type='password'
@@ -88,7 +59,7 @@ const Register = () => {
           )}
           <Grid item>
             <Button variant='contained' onClick={submitForm}>
-              Create account
+              Log in
             </Button>
           </Grid>
         </Grid>
@@ -97,4 +68,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;

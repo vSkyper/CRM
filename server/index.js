@@ -41,7 +41,32 @@ app.get('/users/:page', async (req, res) => {
   }
 });
 
-app.post('/createUser', async (req, res) => {
+app.post('/loginUser', async (req, res) => {
+  if (!req.body.login || !req.body.password) {
+    res.json({ error: 'Fill in all fields.' });
+    return;
+  }
+
+  const user = await users.findOne({
+    attributes: ['password'],
+    where: { login: req.body.login },
+  });
+
+  if (!user) {
+    res.json({ error: "Incorrect username or password." });
+    return;
+  }
+
+  bcrypt.compare(req.body.password, user.password, (err, result) => {
+    if (result){
+      res.json({success: 'Hurra!'})
+    } else {
+      res.json({error: 'Incorrect username or password.'})
+    }
+  });
+});
+
+app.post('/signupUser', async (req, res) => {
   if (
     !req.body.name ||
     !req.body.surname ||
