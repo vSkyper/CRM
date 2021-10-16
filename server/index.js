@@ -112,7 +112,7 @@ app.put('/editUser', async (req, res) => {
 });
 
 app.delete('/deleteUser', async (req, res) => {
-  if (!req.body.id || isNaN(req.body.id)) {
+  if (!req.body.id || isNaN(req.body.id) || req.body.id < 0) {
     res.json({ error: 'Inavlid ID.' });
     return;
   }
