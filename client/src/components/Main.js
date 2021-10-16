@@ -32,11 +32,15 @@ const Main = () => {
     axios
       .get(`http://localhost:3001/users/${page}`)
       .then((res) => {
-        if (res.data.rows.length === 0 && page !== 0) {
-          setPage(page - 1);
+        if (res.data.error) {
+          console.log(res.data.error);
         } else {
-          setUsers(res.data.rows);
-          setTotalPages(res.data.totalPages);
+          if (res.data.rows.length === 0 && page !== 0) {
+            setPage(page - 1);
+          } else {
+            setUsers(res.data.rows);
+            setTotalPages(res.data.totalPages);
+          }
         }
       })
       .catch((error) => console.log(error));
@@ -81,7 +85,11 @@ const Main = () => {
     axios
       .delete('http://localhost:3001/deleteUser', { data: { id } })
       .then(() => {
-        getUsers();
+        if (res.data.error) {
+          console.log(res.data.error);
+        } else {
+          getUsers();
+        }
       })
       .catch((error) => console.log(error));
   };
