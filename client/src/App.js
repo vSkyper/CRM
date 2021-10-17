@@ -8,9 +8,10 @@ import {
   Redirect,
 } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Main from './components/Main';
+import Users from './components/Users';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import ProtectedRoute from './ProtectedRoute';
 import { Context } from './Context';
 
 const App = () => {
@@ -44,17 +45,29 @@ const App = () => {
           <Route exact path='/'>
             <Redirect to='/page/1' />
           </Route>
-          <Route exact path='/page/:page'>
-            <Main />
-          </Route>
-          <Context.Provider value={{ setAuth }}>
-            <Route exact path='/login'>
+          <ProtectedRoute
+            exact
+            path='/page/:page'
+            auth={auth}
+            loginOrSignup={false}
+          >
+            <Context.Provider value={{ setAuth }}>
+              <Users />
+            </Context.Provider>
+          </ProtectedRoute>
+          <ProtectedRoute exact path='/login' auth={auth} loginOrSignup={true}>
+            <Context.Provider value={{ setAuth }}>
               <Login />
-            </Route>
-            <Route exact path='/register'>
-              <Signup />
-            </Route>
-          </Context.Provider>
+            </Context.Provider>
+          </ProtectedRoute>
+          <ProtectedRoute
+            exact
+            path='/register'
+            auth={auth}
+            loginOrSignup={true}
+          >
+            <Signup />
+          </ProtectedRoute>
         </Switch>
       </Router>
     </Container>

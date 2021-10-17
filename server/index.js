@@ -12,7 +12,7 @@ app.use(express.json());
 
 const { UniqueConstraintError, DatabaseError } = require('sequelize');
 
-app.get('/users/:page', async (req, res) => {
+app.get('/users/:page', authenticateToken, async (req, res) => {
   if (!req.params.page || isNaN(req.params.page) || req.params.page < 1) {
     return res.json({ error: 'Inavlid page number.' });
   }
@@ -58,7 +58,9 @@ app.post('/loginUser', async (req, res) => {
 
   bcrypt.compare(req.body.password, user.password, (err, result) => {
     if (result) {
-      const jwtToken = sign({ id: user.id }, 'SuperSecretKey');
+      const jwtToken = sign({ id: user.id }, 'SuperSecretKey', {
+        expiresIn: '10h',
+      });
       return res.json({ token: jwtToken });
     } else {
       return res.json({ error: 'Incorrect username or password.' });

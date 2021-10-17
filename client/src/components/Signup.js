@@ -1,8 +1,7 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { TextField, Grid, Paper, Button, Alert } from '@mui/material';
 import { useHistory } from 'react-router-dom';
-import { Context } from '../Context';
 
 const Register = () => {
   const [login, setLogin] = useState('');
@@ -15,8 +14,6 @@ const Register = () => {
 
   const history = useHistory();
 
-  const { setAuth } = useContext(Context);
-
   const submitForm = () => {
     const data = { name, surname, dateOfBirth, login, password };
 
@@ -26,8 +23,7 @@ const Register = () => {
         if (res.data.error) {
           setError(res.data.error);
         } else {
-          setAuth(true);
-          history.push('/page/1');
+          history.push('/login');
         }
       })
       .catch((error) => console.log(error));

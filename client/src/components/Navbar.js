@@ -16,11 +16,6 @@ const Navbar = () => {
       <AppBar>
         <Toolbar>
           <Grid container spacing={2}>
-            <Grid item>
-              <Button variant='contained' component={Link} to='/'>
-                Home
-              </Button>
-            </Grid>
             {!auth ? (
               <>
                 <Grid item>
@@ -35,11 +30,18 @@ const Navbar = () => {
                 </Grid>
               </>
             ) : (
-              <Grid item>
-                <Button variant='contained' onClick={logout}>
-                  Logout
-                </Button>
-              </Grid>
+              <>
+                <Grid item>
+                  <Button variant='contained' component={Link} to='/'>
+                    Home
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button variant='contained' onClick={logout}>
+                    Logout
+                  </Button>
+                </Grid>
+              </>
             )}
           </Grid>
         </Toolbar>

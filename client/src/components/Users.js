@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import {
   Table,
@@ -15,6 +15,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useHistory, useParams } from 'react-router-dom';
+import { Context } from '../Context';
 
 const Main = () => {
   const [users, setUsers] = useState([]);
@@ -31,19 +32,29 @@ const Main = () => {
   const history = useHistory();
   const { page } = useParams();
 
+  const { setAuth } = useContext(Context);
+
   const getUsers = useCallback(() => {
     axios
-      .get(`http://localhost:3001/users/${page}`)
+      .get(`http://localhost:3001/users/${page}`, {
+        headers: {
+          Authorization: localStorage.getItem('Authorization'),
+        },
+      })
       .then((res) => {
         if (res.data.error) {
-          console.log(res.data.error);
+          if (res.data.error === 'Unauthorized') {
+            setAuth(false);
+          } else {
+            console.log(res.data.error);
+          }
         } else {
           setUsers(res.data.rows);
           setTotalPages(res.data.totalPages);
         }
       })
       .catch((error) => console.log(error));
-  }, [page]);
+  }, [page, setAuth]);
 
   useEffect(() => {
     getUsers();
@@ -74,7 +85,11 @@ const Main = () => {
       })
       .then((res) => {
         if (res.data.error) {
-          setError(res.data.error);
+          if (res.data.error === 'Unauthorized') {
+            setAuth(false);
+          } else {
+            setError(res.data.error);
+          }
         } else {
           getUsers();
           setEditID(null);
@@ -94,7 +109,11 @@ const Main = () => {
       })
       .then((res) => {
         if (res.data.error) {
-          console.log(res.data.error);
+          if (res.data.error === 'Unauthorized') {
+            setAuth(false);
+          } else {
+            console.log(res.data.error);
+          }
         } else {
           getUsers();
         }
