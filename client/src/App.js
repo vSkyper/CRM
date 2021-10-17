@@ -9,13 +9,14 @@ import {
 } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Users from './components/Users';
+import UsersAdmin from './components/UsersAdmin';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import ProtectedRoute from './ProtectedRoute';
 import { Context } from './Context';
 
 const App = () => {
-  const [auth, setAuth] = useState(false);
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
     axios
@@ -26,9 +27,9 @@ const App = () => {
       })
       .then((res) => {
         if (res.data.error) {
-          setAuth(false);
+          setRole(null);
         } else {
-          setAuth(true);
+          setRole(res.data.role);
         }
       })
       .catch((error) => console.log(error));
@@ -38,7 +39,7 @@ const App = () => {
     <Container maxWidth='lg'>
       <CssBaseline />
       <Router basename={process.env.PUBLIC_URL}>
-        <Context.Provider value={{ setAuth, auth }}>
+        <Context.Provider value={{ setRole, role }}>
           <Navbar />
         </Context.Provider>
         <Switch>
@@ -48,22 +49,23 @@ const App = () => {
           <ProtectedRoute
             exact
             path='/page/:page'
-            auth={auth}
+            auth={role}
             loginOrSignup={false}
           >
-            <Context.Provider value={{ setAuth }}>
-              <Users />
+            <Context.Provider value={{ setRole }}>
+              {role === 'user' && <Users />}
+              {role === 'admin' && <UsersAdmin />}
             </Context.Provider>
           </ProtectedRoute>
-          <ProtectedRoute exact path='/login' auth={auth} loginOrSignup={true}>
-            <Context.Provider value={{ setAuth }}>
+          <ProtectedRoute exact path='/login' auth={role} loginOrSignup={true}>
+            <Context.Provider value={{ setRole }}>
               <Login />
             </Context.Provider>
           </ProtectedRoute>
           <ProtectedRoute
             exact
             path='/register'
-            auth={auth}
+            auth={role}
             loginOrSignup={true}
           >
             <Signup />

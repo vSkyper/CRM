@@ -12,7 +12,7 @@ const Login = () => {
 
   const history = useHistory();
 
-  const { setAuth } = useContext(Context);
+  const { setRole } = useContext(Context);
 
   const submitForm = () => {
     const data = { login, password };
@@ -24,7 +24,7 @@ const Login = () => {
           setError(res.data.error);
         } else {
           localStorage.setItem('Authorization', res.data.token);
-          setAuth(true);
+          setRole(res.data.role);
           history.push('/page/1');
         }
       })

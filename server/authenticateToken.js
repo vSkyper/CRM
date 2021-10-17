@@ -1,5 +1,12 @@
 const { verify } = require('jsonwebtoken');
-const { users } = require('./models');
+const { users, roles } = require('./models');
+
+const passRoles = (authorizedRoles) => {
+  return (req, res, next) => {
+    req.roles = authorizedRoles;
+    next();
+  };
+};
 
 const authenticateToken = async (req, res, next) => {
   const tokenHeader = req.header('Authorization');
@@ -19,11 +26,23 @@ const authenticateToken = async (req, res, next) => {
       if (!user) {
         return res.json({ error: 'Unauthorized' });
       }
+
+      const role = await roles.findOne({
+        attributes: ['name'],
+        where: { id: token.roleId },
+      });
+
+      if (!req.roles.includes(role.name)) {
+        return res.json({ error: 'Unauthorized' });
+      }
+
+      req.user = role;
+
       return next();
     }
-  } catch (err) {
+  } catch (error) {
     return res.json({ error: 'Unauthorized' });
   }
 };
 
-module.exports = { authenticateToken };
+module.exports = { authenticateToken, passRoles };

@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 import { Context } from '../Context';
 
 const Navbar = () => {
-  const { setAuth, auth } = useContext(Context);
+  const { setRole, role } = useContext(Context);
 
   const logout = () => {
     localStorage.removeItem('Authorization');
-    setAuth(false);
+    setRole(null);
   };
 
   return (
@@ -16,7 +16,7 @@ const Navbar = () => {
       <AppBar>
         <Toolbar>
           <Grid container spacing={2}>
-            {!auth ? (
+            {!role ? (
               <>
                 <Grid item>
                   <Button variant='contained' component={Link} to='/login'>
