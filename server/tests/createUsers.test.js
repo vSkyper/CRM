@@ -11,6 +11,6 @@ test('createUsers', () => {
       password: faker.internet.password(),
     };
 
-    axios.post('http://localhost:3001/createUser', data);
+    axios.post('http://localhost:3001/signupUser', data);
   }
 });

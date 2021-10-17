@@ -4,7 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { sign } = require('jsonwebtoken');
 const db = require('./models');
-const { users } = require('./models');
+const { users, roles } = require('./models');
 const { authenticateToken } = require('./authenticateToken');
 
 app.use(cors());
@@ -48,7 +48,7 @@ app.post('/loginUser', async (req, res) => {
   }
 
   const user = await users.findOne({
-    attributes: ['id', 'password'],
+    attributes: ['id', 'roleId', 'password'],
     where: { login: req.body.login, isDeleted: false },
   });
 
@@ -58,9 +58,13 @@ app.post('/loginUser', async (req, res) => {
 
   bcrypt.compare(req.body.password, user.password, (err, result) => {
     if (result) {
-      const jwtToken = sign({ id: user.id }, 'SuperSecretKey', {
-        expiresIn: '10h',
-      });
+      const jwtToken = sign(
+        { id: user.id, roleId: user.roleId },
+        'SuperSecretKey',
+        {
+          expiresIn: '10h',
+        }
+      );
       return res.json({ token: jwtToken });
     } else {
       return res.json({ error: 'Incorrect username or password.' });
@@ -80,24 +84,24 @@ app.post('/signupUser', async (req, res) => {
   }
 
   bcrypt.hash(req.body.password, 10, async (err, hash) => {
-    if (err) {
-      return res.json(err);
-    } else {
-      try {
-        await users.create({
-          ...req.body,
-          password: hash,
-          isDeleted: false,
-        });
-        return res.json('Success');
-      } catch (error) {
-        if (error instanceof UniqueConstraintError) {
-          return res.json({ error: 'This username is unavailable.' });
-        } else if (error instanceof DatabaseError) {
-          return res.json({ error: 'Check all fields.' });
-        } else {
-          return res.json({ error: 'Unknown error.' });
-        }
+    try {
+      await users.create({
+        name: req.body.name,
+        surname: req.body.surname,
+        dateOfBirth: req.body.dateOfBirth,
+        login: req.body.login,
+        password: hash,
+        isDeleted: false,
+        roleId: 1,
+      });
+      return res.json('Success');
+    } catch (error) {
+      if (error instanceof UniqueConstraintError) {
+        return res.json({ error: 'This username is unavailable.' });
+      } else if (error instanceof DatabaseError) {
+        return res.json({ error: 'Check all fields.' });
+      } else {
+        return res.json({ error: 'Unknown error.' });
       }
     }
   });
@@ -153,8 +157,44 @@ app.get('/auth', authenticateToken, async (req, res) => {
   return res.json('Success');
 });
 
-db.sequelize.sync().then(() => {
+db.sequelize.sync().then(async () => {
   app.listen(3001, () => {
     console.log('Server initialization success');
   });
+
+  try {
+    await roles.create({ id: 1, name: 'user' });
+    await roles.create({ id: 2, name: 'moderator' });
+    await roles.create({ id: 3, name: 'admin' });
+
+    bcrypt.hash('mod', 10, async (err, hash) => {
+      await users.create({
+        id: 1,
+        name: 'mod',
+        surname: 'mod',
+        dateOfBirth: '1000-01-01',
+        login: 'mod',
+        password: hash,
+        isDeleted: false,
+        roleId: 2,
+      });
+    });
+
+    bcrypt.hash('admin', 10, async (err, hash) => {
+      await users.create({
+        id: 2,
+        name: 'admin',
+        surname: 'admin',
+        dateOfBirth: '1000-01-01',
+        login: 'admin',
+        password: hash,
+        isDeleted: false,
+        roleId: 3,
+      });
+    });
+  } catch (error) {
+    if (error instanceof UniqueConstraintError) {
+      console.log('Already created default values.');
+    }
+  }
 });
