@@ -69,7 +69,7 @@ app.post('/loginUser', async (req, res) => {
   bcrypt.compare(req.body.password, user.password, (error, result) => {
     if (result) {
       const jwtToken = sign(
-        { id: user.id, roleId: user.roleId },
+        { id: user.id, role: role.name },
         'SuperSecretKey',
         {
           expiresIn: '10h',
@@ -178,7 +178,7 @@ app.get(
   passRoles(['user', 'moderator', 'admin']),
   authenticateToken,
   async (req, res) => {
-    return res.json({ role: req.user.name });
+    return res.json({ role: req.role });
   }
 );
 

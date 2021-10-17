@@ -23,20 +23,11 @@ const authenticateToken = async (req, res, next) => {
         where: { id: token.id, isDeleted: false },
       });
 
-      if (!user) {
+      if (!user || !req.roles.includes(token.role)) {
         return res.json({ error: 'Unauthorized' });
       }
 
-      const role = await roles.findOne({
-        attributes: ['name'],
-        where: { id: token.roleId },
-      });
-
-      if (!req.roles.includes(role.name)) {
-        return res.json({ error: 'Unauthorized' });
-      }
-
-      req.user = role;
+      req.role = token.role;
 
       return next();
     }
