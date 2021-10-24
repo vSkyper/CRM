@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Users from './components/Users';
+import UsersMod from './components/UsersMod';
 import UsersAdmin from './components/UsersAdmin';
 import Login from './components/Login';
 import Signup from './components/Signup';
@@ -54,6 +55,7 @@ const App = () => {
           >
             <Context.Provider value={{ setRole }}>
               {role === 'user' && <Users />}
+              {role === 'moderator' && <UsersMod />}
               {role === 'admin' && <UsersAdmin />}
             </Context.Provider>
           </ProtectedRoute>
