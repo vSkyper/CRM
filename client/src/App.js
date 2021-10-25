@@ -17,7 +17,7 @@ import ProtectedRoute from './ProtectedRoute';
 import { Context } from './Context';
 
 const App = () => {
-  const [role, setRole] = useState(null);
+  const [role, setRole] = useState(true);
 
   useEffect(() => {
     axios
