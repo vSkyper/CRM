@@ -127,7 +127,8 @@ app.put(
       !req.body.surname ||
       !req.body.dateOfBirth ||
       !req.body.login ||
-      !req.body.id
+      !req.body.id ||
+      !req.body.roleId
     ) {
       return res.json({ error: 'Fill in all fields.' });
     }
@@ -139,6 +140,7 @@ app.put(
           surname: req.body.surname,
           dateOfBirth: req.body.dateOfBirth,
           login: req.body.login,
+          roleId: req.body.roleId,
         },
         { where: { id: req.body.id } }
       );

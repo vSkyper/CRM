@@ -13,6 +13,10 @@ import {
   Grid,
   Snackbar,
   Alert,
+  FormControl,
+  MenuItem,
+  InputLabel,
+  Select,
 } from '@mui/material';
 import { useHistory, useParams } from 'react-router-dom';
 import { Context } from '../Context';
@@ -26,6 +30,7 @@ const UsersAdmin = () => {
   const [editName, setEditName] = useState('');
   const [editSurname, setEditSurname] = useState('');
   const [editDateOfBirth, setEditDateOfBirth] = useState('');
+  const [editRoleID, setEditRoleID] = useState('');
 
   const [error, setError] = useState(null);
 
@@ -66,6 +71,7 @@ const UsersAdmin = () => {
     setEditName(user.name);
     setEditSurname(user.surname);
     setEditDateOfBirth(user.dateOfBirth);
+    setEditRoleID(user.roleId);
   };
 
   const submitEdit = () => {
@@ -75,6 +81,7 @@ const UsersAdmin = () => {
       surname: editSurname,
       dateOfBirth: editDateOfBirth,
       login: editLogin,
+      roleId: editRoleID,
     };
 
     axios
@@ -131,6 +138,7 @@ const UsersAdmin = () => {
               <TableCell sx={{ width: 300 }}>Name</TableCell>
               <TableCell sx={{ width: 300 }}>Surname</TableCell>
               <TableCell sx={{ width: 300 }}>Birthdate</TableCell>
+              <TableCell sc={{ width: 300 }}>Role</TableCell>
               <TableCell sx={{ width: 100 }}></TableCell>
               <TableCell sx={{ width: 100 }}></TableCell>
             </TableRow>
@@ -176,6 +184,22 @@ const UsersAdmin = () => {
                       />
                     </TableCell>
                     <TableCell>
+                      <FormControl>
+                        <InputLabel id='roleID'>Role</InputLabel>
+                        <Select
+                          labelId='roleID'
+                          value={editRoleID}
+                          label='Role'
+                          onChange={(e) => setEditRoleID(e.target.value)}
+                          sx={{ width: 180 }}
+                        >
+                          <MenuItem value={1}>User</MenuItem>
+                          <MenuItem value={2}>Moderator</MenuItem>
+                          <MenuItem value={3}>Admin</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                    <TableCell>
                       <Button
                         variant='outlined'
                         color='success'
@@ -192,6 +216,7 @@ const UsersAdmin = () => {
                     <TableCell>{user.name}</TableCell>
                     <TableCell>{user.surname}</TableCell>
                     <TableCell>{user.dateOfBirth}</TableCell>
+                    <TableCell>{user.roleId}</TableCell>
                     <TableCell>
                       <Button variant='outlined' onClick={() => setEdit(user)}>
                         Edit
