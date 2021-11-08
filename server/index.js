@@ -26,7 +26,7 @@ app.get(
 
     try {
       let usersList = await users.findAndCountAll({
-        attributes: ['id', 'name', 'surname', 'dateOfBirth', 'login'],
+        attributes: ['id', 'name', 'surname', 'dateOfBirth', 'login', 'roleId'],
         limit,
         offset,
         where: {
